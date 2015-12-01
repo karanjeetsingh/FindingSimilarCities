@@ -5,7 +5,7 @@
 """A list of cities with related information: bounding box, name, local
 Euclidean projection."""
 from string import ascii_lowercase as alphabet
-from api_keys import FLICKR_KEY as key
+"""from api_keys import FLICKR_KEY as key"""
 import LocalCartesian as lc
 from datetime import datetime as dt
 import pytz
@@ -13,12 +13,12 @@ import bidict
 import tempfile
 
 
-def photos_request(bbox):
+"""def photos_request(bbox):
     from calendar import timegm
     for y in range(2008,2015):
         mind = timegm(dt(y,1,1).utctimetuple())
         maxd = timegm(dt(y+1,1,1).utctimetuple())
-        print('curl --silent "https://api.flickr.com/services/rest/?min_upload_date={}&max_upload_date={}&format=json&min_taken_date=1990-07-18+17%3A00%3A00&nojsoncallback=1&method=flickr.photos.search&extras=date_upload%2Cdate_taken%2Cgeo%2Ctags&bbox={}%2C{}%2C{}%2C{}&content_type=1&media=photos&per_page=1&page=1&accuracy=16&api_key={}"| jq .photos.total'.format(mind, maxd, bbox[1], bbox[0], bbox[3], bbox[2], key))
+        print('curl --silent "https://api.flickr.com/services/rest/?min_upload_date={}&max_upload_date={}&format=json&min_taken_date=1990-07-18+17%3A00%3A00&nojsoncallback=1&method=flickr.photos.search&extras=date_upload%2Cdate_taken%2Cgeo%2Ctags&bbox={}%2C{}%2C{}%2C{}&content_type=1&media=photos&per_page=1&page=1&accuracy=16&api_key={}"| jq .photos.total'.format(mind, maxd, bbox[1], bbox[0], bbox[3], bbox[2], key))"""
 
 
 def bbox_to_polygon(bbox):
