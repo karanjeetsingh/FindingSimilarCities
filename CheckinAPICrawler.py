@@ -18,8 +18,8 @@ BITLY_SIZE = 15
 config = ConfigParser.ConfigParser()
 config.read('api_keys.cfg')
 BITLY_TOKEN = config.get('bitly', 'BITLY_TOKEN');
-#CLIENT_ID = config.get('foursquare', 'FOURSQUARE_ID2');
-#CLIENT_SECRET = config.get('foursquare', 'FOURSQUARE_SECRET2');
+CLIENT_ID = config.get('foursquare', 'FOURSQUARE_ID2');
+CLIENT_SECRET = config.get('foursquare', 'FOURSQUARE_SECRET2');
 
 def get_id_and_signature(url):
     """Potentially extract checkin id and signature from `url`."""

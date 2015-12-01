@@ -6,6 +6,7 @@ from time import sleep
 import TwitterAPI as twitter
 import twitter_helper as th
 import arguments
+import ConfigParser
 ARGS = arguments.tweets_parser().parse_args()
 DB = None
 SAVE = None
