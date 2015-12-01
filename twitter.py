@@ -76,6 +76,7 @@ def accumulate_checkins():
 
 def save_checkins(complete, saving_method):
     """Save `complete` using `saving_method`."""
+    print 'Save `complete` using `saving_method`.'
     if not complete:
         return None
     saving_method(complete)

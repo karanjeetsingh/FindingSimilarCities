@@ -62,7 +62,7 @@ class CheckinAPICrawler(object):
         """Use Bitly to expand short link in `urls`.
         Return a list of (checkin id, signature)."""
         try:
-            expanded = [res.get('long_url', None)
+            expanded = [res.get("long_url", None)
                         for res in self.bitly.expand(link=urls)]
         except bitly_api.BitlyError:
             logging.exception("Error expanding URL")
