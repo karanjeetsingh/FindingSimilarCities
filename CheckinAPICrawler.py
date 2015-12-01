@@ -9,15 +9,17 @@ import bitly_api
 import foursquare
 import Chunker
 import logging
+import ConfigParser
 logging.basicConfig(filename='tweets.log', level=logging.INFO,
                     format='%(asctime)s [%(levelname)s]: %(message)s')
 import twitter_helper as th
 CHECKIN_URL = th.CHECKIN_URL
-from api_keys import BITLY_TOKEN
-from api_keys import FOURSQUARE_ID2 as CLIENT_ID
-from api_keys import FOURSQUARE_SECRET2 as CLIENT_SECRET
 BITLY_SIZE = 15
-
+config = ConfigParser.ConfigParser()
+config.read('api_keys.cfg')
+BITLY_TOKEN = config.get('bitly', 'BITLY_TOKEN');
+#CLIENT_ID = config.get('foursquare', 'FOURSQUARE_ID2');
+#CLIENT_SECRET = config.get('foursquare', 'FOURSQUARE_SECRET2');
 
 def get_id_and_signature(url):
     """Potentially extract checkin id and signature from `url`."""
@@ -36,9 +38,13 @@ class FoursquareDown(Exception):
 class CheckinAPICrawler(object):
     """Get checkins info."""
     def __init__(self):
+        print BITLY_TOKEN
         self.bitly = bitly_api.Connection(access_token=BITLY_TOKEN)
+        print "reached bitly"
         self.client = foursquare.Foursquare(CLIENT_ID, CLIENT_SECRET)
+        print "reached foursquare"
         self.bitly_batch = Chunker.Chunker(BITLY_SIZE)
+        print "reached chuncker"
         self.failures = th.Failures(initial_waiting_time=1.8)
 
     def checkins_from_url(self, urls):
