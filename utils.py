@@ -13,6 +13,7 @@ import numpy as np
 
 
 def noise():
+    print 'utils.py/noise'
     return uniform(0, 1e-6)
 
 
@@ -22,6 +23,7 @@ def to_css_hex(color):
     >>> to_css_hex([1, 0, 1, .7])
     '#ff00ff'
     """
+    print 'utils.py/to_css_hex'
     r = '#'
     for i in color[:-1]:
         c = hex(int(255*i))[2:]
@@ -33,6 +35,7 @@ def to_css_hex(color):
 
 
 def photos_to_heat_dataset(city, precision=4, limit=300):
+    print 'utils.py/photos_to_heat_dataset'
     photos = load_var(city)
     points = Counter([(round(p[0], precision), round(p[1], precision))
                       for p in photos])
@@ -45,6 +48,7 @@ def photos_to_heat_dataset(city, precision=4, limit=300):
 
 
 def photos_to_cluster_dataset(city, limit=300):
+    print 'utils.py/photos_to_cluster_dataset'
     photos = load_var(city)
     points = [[p[0] + noise(), p[1] + noise(), 'Win!']
               for p in photos[:limit]]
@@ -54,12 +58,14 @@ def photos_to_cluster_dataset(city, limit=300):
 
 def output_checkins(city, host=cm.HOST, port=cm.PORT):
     """Write a JS array of all checkins in `city` with their hour."""
+    print 'utils.py/output_checkins'
     checkins = cm.connect_to_db('foursquare', host, port)[0]['checkin']
     query = cm.build_query(city, venue=False, fields=['loc', 'time'])
     res = checkins.aggregate(query)['result']
 
     def format_checkin(checkin):
         """Extract location (plus jitter) and hour from checkin"""
+        print 'utils.py/format_checkin'
         lng, lat = checkin['loc']['coordinates']
         hour = checkin['time'].hour
         return [lng + noise(), lat + noise(), hour]
@@ -89,6 +95,7 @@ def get_nested(dico, fields, default=None):
     >>> get_nested({'names': {'symbols': 'euro'}}, ['names', 'urls'], [])
     []
     """
+    #print 'utils.py/get_nested'
     if not hasattr(fields, '__iter__'):
         return dico.get(fields, default)
     current = dico
@@ -110,6 +117,7 @@ def xzip(items, fields):
     >>> xzip([], ['a', 'b'])
     [[], []]
     """
+    print 'utils.py/xzip'
     unpack = lambda x: [x[f] for f in fields]
     res = zip(*[unpack(x) for x in items])
     if res == []:
@@ -119,6 +127,7 @@ def xzip(items, fields):
 
 def compute_entropy(c):
     """Compute entropy of a numpy array `c`."""
+    print 'utils.py/compute_entropy'
     mask = c > 0
     N = np.sum(c)
     return np.log(N) - np.sum(c[mask]*np.log(c[mask]))/N
@@ -141,6 +150,7 @@ def human_day(time, new_day=4, period=True):
     >>> human_day(dt(2014, 3, 17, 2))
     20
     """
+    print 'utils.py/human_day'
     hour, day = time.hour, time.weekday()
     if new_day <= hour < new_day + 24/3:
         shift = 0
@@ -155,6 +165,7 @@ def human_day(time, new_day=4, period=True):
 
 def geodesic_distance(point_1, point_2):
     """Return the distance in meters between two JSON Points."""
+    print 'utils.py/geodesic_distance'
     assert 'coordinates' in point_1 and 'coordinates' in point_2
     p1_lon, p1_lat = point_1['coordinates']
     p2_lon, p2_lat = point_2['coordinates']
@@ -165,6 +176,7 @@ def answer_to_dict(cursor, transfo=None, default=None):
     """Take a `cursor` resulting from a mongo find query and return a
     dictionary id: `transfo`(value) (provided that there is only one other
     field) (or `default`)."""
+    print 'utils.py/answer_to_dict'
     try:
         first = cursor.next()
     except StopIteration:
@@ -180,6 +192,7 @@ def answer_to_dict(cursor, transfo=None, default=None):
 
 def convert_icwsm_checkin(checkins):
     """Harmonize user and id fields between old and new checkins"""
+    print 'utils.py/convert_icwsm_checkin'
     limit = dt(2014, 1, 1)
     for old in checkins.find({'time': {'$lte': limit}}):
         _id, uid = old['_id'], str(old['uid'])
@@ -188,14 +201,17 @@ def convert_icwsm_checkin(checkins):
 
 def memodict(f):
     """Memoization decorator for a function taking a single argument """
+    print 'utils.py/memodict'
     # http://code.activestate.com/recipes/578231
     class memodict(dict):
         def __missing__(self, key):
+            print 'utils.py/memodict/__missing__'
             ret = self[key] = f(key)
             return ret
     return memodict().__getitem__
 
 if __name__ == '__main__':
+    print 'utils.py/__main__'
     import doctest
     doctest.testmod()
     #pylint: disable=C0103

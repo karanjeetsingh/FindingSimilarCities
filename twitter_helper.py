@@ -23,6 +23,7 @@ FullCheckIn = namedtuple('FullCheckIn', ['id', 'lid', 'uid', 'city', 'loc',
 def parse_tweet(tweet):
     """Return a CheckIn from `tweet` or None if it is not located in a valid
     city"""
+    #print 'twitter_helper.py/parse_tweet'
     loc = u.get_nested(tweet, 'coordinates')
     city = None
     if not loc:
@@ -32,8 +33,10 @@ def parse_tweet(tweet):
         return None
     lon, lat = loc['coordinates']
     city = find_town(lat, lon, CITIES_TREE)
+    #print 'city', city
     if not (city and city in cities.SHORT_KEY):
         return None
+    #print 'tree', CITIES_TREE
     tid = u.get_nested(tweet, 'id_str')
     urls = u.get_nested(tweet, ['entities', 'urls'], [])
     # short url of the checkin that need to be expand, either using bitly API
@@ -59,6 +62,7 @@ def parse_tweet(tweet):
 def import_json():
     """Return a json module (first trying ujson then simplejson and finally
     json from standard library)."""
+    #print 'twitter_helper.py/import_json'
     try:
         import ujson as json
     except ImportError:
@@ -75,6 +79,7 @@ def log_exception(log, default=None, reraise=False):
     """If `func` raises an exception, log it to `log`. By default, assume it's
     not critical and thus resume execution by returning `default`, except if
     `reraise` is True."""
+    print 'twitter_helper.py/log_exception'
     def actual_decorator(func):
         """Real decorator, with no argument"""
         @functools.wraps(func)
@@ -97,6 +102,7 @@ class Failures(object):
     """Keep track of Failures."""
     def __init__(self, initial_waiting_time):
         """`initial_waiting_time` is in minutes."""
+        #print 'twitter_helper.py/Failures/__init__'
         self.total_failures = 0
         self.last_failure = clock()
         self.initial_waiting_time = float(initial_waiting_time)*60.0
@@ -104,11 +110,13 @@ class Failures(object):
 
     def reset(self):
         """Restore initial state with no recent failure."""
+        #print 'twitter_helper.py/Failures/reset'
         self.recent_failures = 0
         self.waiting_time = self.initial_waiting_time
 
     def fail(self):
         """Register a new failure and return a reasonable time to wait"""
+        print 'twitter_helper.py/Failures/fail'
         if self.has_failed_recently():
             # Hopefully the golden ration will bring us luck next time
             self.waiting_time *= 1.618
@@ -121,16 +129,19 @@ class Failures(object):
 
     def has_failed_recently(self, small=3600):
         """Has it failed in the last `small` seconds?"""
+        print 'twitter_helper.py/Failures/has_failed_recently'
         return self.total_failures > 0 and clock() - self.last_failure < small
 
     def do_sleep(self):
         """Indeed perform waiting."""
+        print 'twitter_helper.py/Failures/do_sleep'
         sleep(self.waiting_time)
 
 
 def parse_json_checkin(json, url=None):
     """Return salient info about a Foursquare checkin `json` that can be
     either JSON text or already parsed as a dictionary."""
+    #print 'twitter_helper.py/parse_json_checkin'
     if not json:
         return None
     if not isinstance(json, dict):
@@ -158,6 +169,7 @@ def parse_json_checkin(json, url=None):
 
 def save_checkins_json(complete, prefix='tweets'):
     """Save `complete` as JSON in a file."""
+    #print 'twitter_helper.py/save_checkins_json'
     now = datetime.now().strftime('%Y%m%d_%H%M%S')
     filename = '{}_{}.json'.format(prefix, now)
     msg = 'Save {} tweets in {}.'.format(len(complete), filename)
@@ -182,6 +194,7 @@ from numpy import median
 
 
 def build_tree(bboxes, depth=0, max_depth=2):
+    #print 'twitter_helper.py/build_tree'
     if depth >= max_depth:
         return bboxes
     split_val = median([b.bottom[1] for b in bboxes])
@@ -196,6 +209,7 @@ def build_tree(bboxes, depth=0, max_depth=2):
 
 
 def find_town(x, y, tree, depth=0):
+    #print 'twitter_helper.py/find_town'
     if isinstance(tree, list):
         for city in tree:
             if city.contains(x, y):
@@ -214,20 +228,24 @@ class Bbox():
     name = None
 
     def __init__(self, bbox, name):
+        #print 'twitter_helper.py/Bbox/__init__'
         self.bottom = Point(*bbox[:2])
         self.top = Point(*bbox[2:])
         self.name = name
 
     def contains(self, x, y):
+        #print 'twitter_helper.py/Bbox/contains'
         return self.bottom.x <= x <= self.top.x and\
             self.bottom.y <= y <= self.top.y
 
     def __repr__(self):
+        print 'twitter_helper.py/Bbox/__repr__'
         return '{}: {:.2f}, {:.2f}'.format(self.name, self.bottom.x,
                                            self.bottom.y)
 
 
 def obtain_tree():
+    #print 'twitter_helper.py/obtain_tree'
     all_cities = cities.US + cities.EU
     cities_names = [cities.short_name(c) for c in cities.NAMES]
     bboxes = [Bbox(city, name) for city, name in zip(all_cities,

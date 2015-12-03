@@ -17,9 +17,9 @@ CHECKIN_URL = th.CHECKIN_URL
 BITLY_SIZE = 15
 config = ConfigParser.ConfigParser()
 config.read('api_keys.cfg')
-BITLY_TOKEN = config.get('bitly', 'BITLY_TOKEN');
-CLIENT_ID = config.get('foursquare', 'FOURSQUARE_ID2');
-CLIENT_SECRET = config.get('foursquare', 'FOURSQUARE_SECRET2');
+BITLY_TOKEN = config.get('bitly', 'BITLY_TOKEN')
+CLIENT_ID = config.get('foursquare', 'FOURSQUARE_ID2')
+CLIENT_SECRET = config.get('foursquare', 'FOURSQUARE_SECRET2')
 
 def get_id_and_signature(url):
     """Potentially extract checkin id and signature from `url`."""
@@ -38,13 +38,9 @@ class FoursquareDown(Exception):
 class CheckinAPICrawler(object):
     """Get checkins info."""
     def __init__(self):
-        print BITLY_TOKEN
         self.bitly = bitly_api.Connection(access_token=BITLY_TOKEN)
-        print "reached bitly"
         self.client = foursquare.Foursquare(CLIENT_ID, CLIENT_SECRET)
-        print "reached foursquare"
         self.bitly_batch = Chunker.Chunker(BITLY_SIZE)
-        print "reached chuncker"
         self.failures = th.Failures(initial_waiting_time=1.8)
 
     def checkins_from_url(self, urls):
@@ -66,15 +62,9 @@ class CheckinAPICrawler(object):
                         for res in self.bitly.expand(link=urls)]
         except bitly_api.BitlyError:
             logging.exception("Error expanding URL")
-            # Could also wait here, but actually, I have never seen it happen.
-            # So let's trust bitly reliability for now
             expanded = itertools.repeat(None, BITLY_SIZE)
         return [get_id_and_signature(url) for url in expanded]
 
-    # TODO: Swarm checkin don't have signature in their public URL and they
-    # don't need it because there is a new API call that deals with that:
-    # https://developer.foursquare.com/docs/checkins/resolve
-    # Check if it's already in foursquare python api
     def query_foursquare(self, id_and_sig):
         """Request Foursquare to get raw info about checkins in `id_and_sig`"""
         for cid, sig in id_and_sig:
@@ -123,13 +113,3 @@ class CheckinAPICrawler(object):
                     checkin_info = (cid + '?s=' + sig, ) + parsed
                 res.append(checkin_info)
         return res
-
-if __name__ == '__main__':
-    # pylint: disable=C0103
-    crawler = CheckinAPICrawler()
-    test_urls = ['http://4sq.com/1n6608z', u'http://4sq.com/1h1Ii5S',
-                 'http://4sq.com/FAKE666', 'http://4sq.com/h2UIDl',
-                 'http://4sq.com/gNlqGb', 'http://4sq.com/eISsW0',
-                 'http://4sq.com/fLc5gJ', 'http://4sq.com/eCaKGm']
-    for ck in crawler.checkins_from_url(test_urls):
-        print(ck)

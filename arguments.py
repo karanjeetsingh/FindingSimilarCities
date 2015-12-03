@@ -3,9 +3,10 @@
 """Provide a standard argument parser."""
 import argparse
 
-
+"""
 def get_parser(desc=None):
-    """build a parser with host and port number"""
+    #build a parser with host and port number
+    #print 'arguments.py/get_parser'
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("-p", "--port", help="MongoDB port number",
                         type=lambda x: valid_number(x, 1023, 64536),
@@ -13,10 +14,11 @@ def get_parser(desc=None):
     parser.add_argument("--host", help="MongoDB host name",
                         default="localhost")
     return parser
-
+"""
 
 def valid_city(city):
     """Ensure city argument is valid"""
+    print 'arguments.py/valid_city'
     import cities
     city = cities.short_name(city)
     if city == 'whole' or city in cities.SHORT_KEY:
@@ -26,6 +28,7 @@ def valid_city(city):
 
 def city_parser(desc=None):
     """default parser plus city name"""
+    print 'arguments.py/city_parser'
     parser = get_parser(desc)
     parser.add_argument("city", help="city name", type=valid_city)
     return parser
@@ -33,6 +36,7 @@ def city_parser(desc=None):
 
 def two_cities(desc=None):
     """default parser plus 2 city names"""
+    print 'arguments.py/two_cities'
     parser = get_parser(desc)
     parser.add_argument("origin", help="The city where you choose venues",
                         type=valid_city)
@@ -43,6 +47,7 @@ def two_cities(desc=None):
 
 def valid_number(number, lower, upper, ntype=int):
     """Ensure numeric argument is within bounds"""
+    #print 'arguments.py/valid_number'
     try:
         number = ntype.__call__(number)
     except ValueError:
@@ -52,17 +57,20 @@ def valid_number(number, lower, upper, ntype=int):
     msg = '{} is not between {} and {}'.format(number, lower+1, upper-1)
     raise argparse.ArgumentTypeError(msg)
 
-
+"""
 def tweets_parser():
-    """default parser plus run time duration"""
+    #default parser plus run time duration
+    #print 'arguments.py/tweets_parser'
     parser = get_parser('stream Twitter to find checkins')
     parser.add_argument("duration", help="how many hours to run",
                         type=lambda x: valid_number(x, 0, 24, float))
     parser.add_argument("-m", "--mongodb", action="store_true", default=False,
                         help="Store checkins in a Mongo database")
     return parser
+    """
 
 if __name__ == '__main__':
+    print 'arguments.py/__main__'
     ARGS = tweets_parser()
     ARGS = ARGS.parse_args()
     if ARGS.mongodb:

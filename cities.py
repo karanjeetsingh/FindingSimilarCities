@@ -24,6 +24,7 @@ import tempfile
 def bbox_to_polygon(bbox):
     """Return a 4 points polygon based on the bottom left and upper
     right coordinates of bbox [lat_bl, long_bl, lat_ur, long_ur]"""
+    #print 'cities.py/bbox_to_polygon'
     assert(len(bbox) == 4)
     lat_bl, long_bl, lat_ur, long_ur = bbox
     return [[lat_bl, long_bl], [lat_bl, long_ur],
@@ -32,6 +33,7 @@ def bbox_to_polygon(bbox):
 
 def short_name(long_name):
     """Return normalized name of city"""
+    #print 'cities.py/short_name'
     return ''.join([c.lower() for c in long_name if c.lower() in alphabet])
 
 NYC = [40.583, -74.040, 40.883, -73.767]
@@ -56,6 +58,8 @@ STO = [59.3003, 17.996, 59.3614, 18.162]
 BAR = [41.3253, 2.1004, 41.4669, 2.240]
 US = [NYC, WAS, SAF, ATL, IND, LAN, SEA, HOU, SLO, CHI]
 EU = [LON, PAR, BER, ROM, PRA, MOS, AMS, HEL, STO, BAR]
+#US = [CHI]
+#EU = [BAR]
 NAMES = ['New York', 'Washington', 'San Francisco', 'Atlanta', 'Indianapolis',
          'Los Angeles', 'Seattle', 'Houston', 'St. Louis', 'Chicago',
          'London', 'Paris', 'Berlin', 'Rome', 'Prague', 'Moscow', 'Amsterdam',
@@ -67,6 +71,9 @@ _TIMEZONES = ['America/New_York', 'America/New_York', 'America/Los_Angeles',
               'Europe/Paris', 'Europe/Berlin', 'Europe/Rome', 'Europe/Prague',
               'Europe/Moscow', 'Europe/Amsterdam', 'Europe/Helsinki',
               'Europe/Stockholm', 'Europe/Madrid']
+
+#NAMES = ['Chicago','Barcelona']
+#_TIMEZONES = ['America/Chicago','Europe/Madrid']
 UTC_TZ = pytz.utc
 SHORT_KEY = [short_name(city) for city in NAMES]
 FULLNAMES = bidict.bidict(zip(SHORT_KEY, NAMES))
@@ -82,6 +89,7 @@ BBOXES = dict(zip(SHORT_KEY, [bbox_to_polygon(b) for b in US+EU]))
 def euclidean_to_geo(city, coords):
     """Convert back from 2D `coords` [lat, lng] to latitude and longitude
     whithin `city` using an external program (so it's not fast)."""
+    print 'cities.py/euclidean_to_geo'
     import subprocess as sp
     import os
     bounds = (US+EU)[SHORT_KEY.index(city)]
@@ -108,6 +116,7 @@ def utc_to_local(city, time):
     >>> utc_to_local('newyork', dt(2009, 2, 25, 12, 45))
     datetime.datetime(2009, 2, 25, 7, 45)
     """
+    #print 'cities.py/utc_to_local'
     time = time.replace(tzinfo=UTC_TZ)
     time = TZ[city].normalize(time.astimezone(TZ[city]))
     return time.replace(tzinfo=None)
@@ -120,10 +129,12 @@ def local_to_utc(city, time):
     >>> local_to_utc('newyork', dt(2009, 2, 25, 7, 45))
     datetime.datetime(2009, 2, 25, 12, 45)
     """
+    print 'cities.py/local_to_utc'
     time = time.replace(tzinfo=None)
     return time - TZ[city].utcoffset(time, True)
 
 if __name__ == '__main__':
+    print 'cities.py/__main__'
     from random import uniform, choice, randint
     from geographiclib.geodesic import Geodesic
     import doctest

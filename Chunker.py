@@ -8,12 +8,14 @@ class Chunker(object):
     Leftovers are yielded at the end.
     """
     def __init__(self, chunksize):
+        #print 'Chunker.py/Chunker/__init__'
         assert chunksize > 0
         self.chunksize = chunksize
         self.chunk = []
 
     def __call__(self, iterable):
         """Yield items from `iterable` `self.chunksize` at the time."""
+        #print 'Chunker.py/Chunker/__call__'
         assert len(self.chunk) < self.chunksize
         for item in iterable:
             self.chunk.append(item)
@@ -25,6 +27,7 @@ class Chunker(object):
             yield self.chunk
 
 if __name__ == '__main__':
+    print 'Chunker.py/__main__'
     chunker = Chunker(3)
     res = [''.join(chunk) for chunk in chunker('abcdefghij')]
     assert res == ['abc', 'def', 'ghi', 'j']

@@ -20,6 +20,7 @@ import numpy
 
 class LocalCartesian(object):
     def __init__(self, lat0, lon0, h0=0):
+        #print 'LocalCartesian.py/LocalCartesian/__init__'
         self.lat0 = lat0
         self.lon0 = geomath.AngNormalize(lon0)
         self.h0 = h0
@@ -34,6 +35,7 @@ class LocalCartesian(object):
 
     def forward(self, lat_lng, h=0):
         """Convert from geodetic to local cartesian coordinates"""
+        print 'LocalCartesian.py/LocalCartesian/forward'
         if hasattr(lat_lng, 'shape'):
             column_dim = (lat_lng.shape[0], 1)
             lat_lng = numpy.hstack([lat_lng, numpy.tile(h, column_dim)])
@@ -45,6 +47,7 @@ class LocalCartesian(object):
 
 def earth_forward(lat, lon, h):
     """Geocentric::IntForward"""
+    #print 'LocalCartesian.py/eart_forward'
     lon = geomath.AngNormalize(lon)
     phi = math.radians(lat)
     lam = math.radians(lon)
@@ -65,6 +68,7 @@ def earth_forward(lat, lon, h):
 
 
 def bforward(coords):
+    print 'LocalCartesian.py/bforward'
     angles = to_unsafe_angles(coords)
     n = _a/numpy.sqrt(1 - _e2 * angles[:, 0] * angles[:, 0])
     Z = (_e2m * n + coords[:, 2]) * angles[:, 0]
@@ -77,6 +81,7 @@ def bforward(coords):
 def to_unsafe_angles(coords):
     """Return a n×4 array of (sphi, cphi, slam, clam) from a n×2 array
     `coords` of (lat, lon), without any validity checks or correction."""
+    print 'LocalCartesian.py/to_unsafe_angels'
     phi = numpy.radians(coords[:, 0])
     lam = numpy.radians(coords[:, 1])
     return numpy.vstack([numpy.sin(phi), numpy.cos(phi),
@@ -85,6 +90,7 @@ def to_unsafe_angles(coords):
 
 def to_unsafe_coords(angles):
     """Reverse the action of to_unsafe_angles."""
+    print 'LocalCartesian.py/to_unsafe_coords'
     lat = numpy.degrees(numpy.arcsin(angles[:, 0]))
     aslon = numpy.arcsin(angles[:, 2])
     lon = numpy.sign(aslon) * numpy.degrees(numpy.arccos(angles[:, 3]))
@@ -93,6 +99,7 @@ def to_unsafe_coords(angles):
 
 def geocentric_rotation(sphi, cphi, slam, clam):
     """Geocentric::Rotation"""
+    #print 'LocalCartesian.py/geocentric_rotation'
     return numpy.matrix([
         [-slam,  clam, 0],
         [-clam * sphi, -slam * sphi, cphi],
@@ -102,6 +109,7 @@ def geocentric_rotation(sphi, cphi, slam, clam):
 if __name__ == '__main__':
     # ref value where obtain by
     # echo "60.15 24.91 0" | CartConvert -l 60.19415 24.92945 0
+    print 'LocalCartesian.py/__main__'
     ref = '-1080.3931874725 -4918.8217761851 -1.9863406491'.split()
     center = LocalCartesian(60.19415, 24.92945)
     res = center.forward([60.15, 24.91])
